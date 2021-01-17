@@ -1,11 +1,23 @@
 package main
 
 import (
-	"fmt"
-	"os"
 	"bufio"
+	"fmt"
 	"log"
+	"os"
 )
+
+type Point struct {
+	x int
+	y int
+}
+
+type Node struct {
+	costStart int
+	costEnd int
+	costSum int
+	parent Point
+}
 
 func readFile(fileName string) []string {
 	file, err := os.Open(fileName)
@@ -40,5 +52,14 @@ func main() {
 	}
 	var maze []string = readFile(fileName)
 	fmt.Println(maze)
+
+	var openList map[Point]Node = make(map[Point]Node)
+	var closedList map[Point]Node = make(map[Point]Node)
+	var p Point = Point{1,2}
+	var n Node = Node{1, 3, 4, Point{1,2}}
+
+	openList[p] = n
+	closedList[p] = n
+	fmt.Println(openList, closedList)
 	return
 }
