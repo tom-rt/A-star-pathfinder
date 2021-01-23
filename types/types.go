@@ -8,7 +8,7 @@ type Point struct {
 type Node struct {
 	CostStart int
 	CostEnd int
-	CostSum int
+	Cost int
 	Parent Point
 }
 

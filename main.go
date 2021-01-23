@@ -15,12 +15,30 @@ func getNeighbors(maze Maze, point Point) (Point, Point, Point, Point) {
 	return top, right, bottom, left
 }
 
-func calcNode(maze Maze, point Point) Node {
-	var n Node = Node{1, 3, 4, Point{1,2}}
+func calcDistance(pointA Point, pointB Point) int {
+	var abs int
+	dist := (pointA.X - pointB.X) + (pointA.X - pointB.X)
+	if dist < 0 {
+		abs = dist * -1
+	} else {
+		abs = dist
+	}
+	return abs
+}
+
+func createNode(maze Maze, parent Point, point Point) Node {
+	var costStart = calcDistance(maze.Start, point)
+	var costEnd = calcDistance(maze.End, point)
+	var n Node = Node {
+		CostStart: costStart,
+		CostEnd: costEnd,
+		Cost: costStart + costEnd,
+		Parent: parent,
+	}
 	return n
 }
 
-func analyzePoint(maze Maze, openList map[Point]Node, closedList map[Point]Node, point Point) {
+func analyzePoint(maze Maze, openList map[Point]Node, closedList map[Point]Node, parent Point, point Point) {
 	var check bool
 
 	// est-ce un obstacle ? Si oui, on oublie ce nœud ;
@@ -48,15 +66,14 @@ func analyzePoint(maze Maze, openList map[Point]Node, closedList map[Point]Node,
 
 	// est-il dans la liste ouverte ? Si oui, on calcule la qualité de ce nœud, et si elle est meilleure que celle de son homologue dans la liste ouverte, on modifie le nœud présent dans la liste ouverte ;
 	node, check := openList[point]
+	newNode := createNode(maze, parent, point)
 	if check {
-		newNode := calcNode(maze, point) 
-		if (node.CostSum > newNode.CostSum) {
-			return
+		if (node.Cost > newNode.Cost) {
+			openList[point] = newNode
 		}
-		return
+	} else { // sinon, on l'ajoute dans la liste ouverte avec comme parent le noed courant, et on calcule sa qualité.
+		openList[point] = newNode
 	}
-
-	// sinon, on l'ajoute dans la liste ouverte avec comme parent le noed courant, et on calcule sa qualité.
 
 	// var p Point = Point{1,2}
 	// closedList[p] = n
@@ -73,10 +90,10 @@ func solve(maze Maze) {
 	top, right, bottom, left := getNeighbors(maze, currPoint)
 	
 	// On regarde tous ses nœuds voisins.
-	analyzePoint(maze, openList, closedList, top)
-	analyzePoint(maze, openList, closedList, right)
-	analyzePoint(maze, openList, closedList, bottom)
-	analyzePoint(maze, openList, closedList, left)
+	analyzePoint(maze, openList, closedList, currPoint, top)
+	analyzePoint(maze, openList, closedList, currPoint, right)
+	analyzePoint(maze, openList, closedList, currPoint, bottom)
+	analyzePoint(maze, openList, closedList, currPoint, left)
 
 	fmt.Println(openList, closedList)
 	// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
