@@ -17,3 +17,5 @@ type Maze struct {
 	Start Point
 	End Point
 }
+
+type List map[Point]*Node
