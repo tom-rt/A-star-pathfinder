@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	_ "math"
 	maze "pathfinder/maze"
 	. "pathfinder/types"
 )
@@ -30,9 +31,13 @@ func getBestNode(list List) (Point, *Node) {
 	return bestPoint, bestNode
 }
 
+// func calcDistanceFloat(pointA Point, pointB Point) float64 {
+// 	return math.Sqrt(((pointA.X - pointB.X) * (pointA.X - pointB.X)) + ((pointA.Y - pointB.Y) * (pointA.Y - pointB.Y)))
+// }
+
 func calcDistance(pointA Point, pointB Point) int {
 	var abs int
-	dist := (pointA.X - pointB.X) + (pointA.Y - pointB.Y)
+	dist := ((pointA.X - pointB.X) * (pointA.X - pointB.X)) + ((pointA.Y - pointB.Y) * (pointA.Y - pointB.Y))
 	if dist < 0 {
 		abs = dist * -1
 	} else {
