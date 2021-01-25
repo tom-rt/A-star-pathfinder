@@ -25,8 +25,8 @@ func CreateMaze(fileName string) Maze {
 
 	for scanner.Scan() {
 		line = scanner.Text()
-		startX = strings.Index(line, "x")
-		endX = strings.Index(line, "o")
+		startX = strings.Index(line, "D")
+		endX = strings.Index(line, "A")
 
 		if startX != -1 {
 			m.Start = Point{startX, len(m.Maze)}
