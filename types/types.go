@@ -5,10 +5,17 @@ type Point struct {
 	Y int
 }
 
-type Node struct {
+type NodeInt struct {
 	CostStart int
 	CostEnd int
 	Cost int
+	Parent Point
+}
+
+type NodeFloat struct {
+	CostStart float64 
+	CostEnd float64
+	Cost float64
 	Parent Point
 }
 
@@ -18,4 +25,5 @@ type Maze struct {
 	End Point
 }
 
-type List map[Point]*Node
+type ListInt map[Point]*NodeInt
+type ListFloat map[Point]*NodeFloat
