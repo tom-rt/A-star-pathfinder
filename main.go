@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	_ "math"
-	astarint "pathfinder/astar/int"
 	astarfloat "pathfinder/astar/float"
+	astarint "pathfinder/astar/int"
 	. "pathfinder/types"
 	utils "pathfinder/utils"
 )
@@ -17,17 +17,21 @@ func printMaze(maze []string) {
 
 func main() {
 	var maze Maze
-	var fileName string = utils.GetFileName()
+	fileName, print := utils.GetParams()
 	if len(fileName) == 0 {
 		return
 	}
 
 	maze = utils.CreateMazeFromFile(fileName)
 	astarint.FindPath(maze)
-	printMaze(maze.Maze)
+	if print {
+		printMaze(maze.Maze)
+	}
 	maze = utils.CreateMazeFromFile(fileName)
 	astarfloat.FindPath(maze)
-	printMaze(maze.Maze)
+	if print {
+		printMaze(maze.Maze)
+	}
 
 	return
 }

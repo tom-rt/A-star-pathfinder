@@ -2,7 +2,6 @@ package utils
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -41,11 +40,15 @@ func CreateMazeFromFile(fileName string) Maze {
 	return m
 }
 
-func GetFileName() string {
-	if len(os.Args) != 2 {
-		fmt.Println("Please provide a file name.")
-		return ""
+func GetParams() (string, bool) {
+	len := len(os.Args)
+	if len == 2 {
+		fileName := os.Args[1]
+		return fileName, false
+	} else if len == 3 && os.Args[1] == "-p" {
+		fileName := os.Args[2]
+		return fileName, true
+	} else {
+		return "", false
 	}
-	fileName := os.Args[1]
-	return fileName
 }

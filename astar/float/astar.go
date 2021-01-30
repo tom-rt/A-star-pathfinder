@@ -3,21 +3,30 @@ package astarfloat
 import (
 	"fmt"
 	"math"
+	t "pathfinder/types"
 	"strconv"
-	. "pathfinder/types"
 )
 
-func getNeighbors(maze Maze, point Point) (Point, Point, Point, Point) {
-	var top Point = Point{X: point.X, Y: point.Y - 1}
-	var right Point = Point{X: point.X + 1, Y: point.Y}
-	var bottom Point = Point{X: point.X, Y: point.Y + 1}
-	var left Point = Point{X: point.X - 1, Y: point.Y}
+type node struct {
+	CostStart float64 
+	CostEnd float64
+	Cost float64
+	Parent t.Point
+}
+
+type list map[t.Point]*node
+
+func getNeighbors(maze t.Maze, point t.Point) (t.Point, t.Point, t.Point, t.Point) {
+	var top t.Point = t.Point{X: point.X, Y: point.Y - 1}
+	var right t.Point = t.Point{X: point.X + 1, Y: point.Y}
+	var bottom t.Point = t.Point{X: point.X, Y: point.Y + 1}
+	var left t.Point = t.Point{X: point.X - 1, Y: point.Y}
 	return top, right, bottom, left
 }
 
-func getBestNode(list ListFloat) (Point, *NodeFloat) {
-	var bestNode *NodeFloat
-	var bestPoint Point
+func getBestNode(list list) (t.Point, *node) {
+	var bestNode *node
+	var bestPoint t.Point
 	var found bool = false
 
 	for key, val := range list {
@@ -31,19 +40,16 @@ func getBestNode(list ListFloat) (Point, *NodeFloat) {
 	return bestPoint, bestNode
 }
 
-func calcDistance(pointA Point, pointB Point) float64 {
+func calcDistance(pointA t.Point, pointB t.Point) float64 {
 	var ax float64 = float64(pointA.X)
 	var ay float64 = float64(pointA.Y)
 	var bx float64 = float64(pointB.X)
 	var by float64 = float64(pointB.Y)
 	ret := math.Sqrt(((ax - bx) * (ax - bx)) + ((ay - by) * (ay - by)))
-	// ret := ((ax - bx) * (ax - bx)) + ((ay - by) * (ay - by))
 	return ret
 }
 
-func createNode(maze Maze, parent Point, parentNode *NodeFloat, point Point) *NodeFloat {
-	// var costStart = calcDistance(maze.Start, point)
-	// fmt.Println(parentNode)
+func createNode(maze t.Maze, parent t.Point, parentNode *node, point t.Point) *node {
 	var distStart float64
 	if (parentNode == nil){
 		distStart = 1
@@ -52,7 +58,7 @@ func createNode(maze Maze, parent Point, parentNode *NodeFloat, point Point) *No
 	}
 	var costStart = distStart
 	var costEnd = calcDistance(maze.End, point)
-	var node NodeFloat = NodeFloat {
+	var node node = node {
 		CostStart: costStart,
 		CostEnd: costEnd,
 		Cost: costStart + costEnd,
@@ -61,7 +67,7 @@ func createNode(maze Maze, parent Point, parentNode *NodeFloat, point Point) *No
 	return &node
 }
 
-func analyzePoint(maze Maze, openList ListFloat, closedList ListFloat, parent Point, point Point) {
+func analyzePoint(maze t.Maze, openList list, closedList list, parent t.Point, point t.Point) {
 	var check bool
 	// Est-ce un obstacle ? Si oui, on oublie ce nœud ;
 	if maze.Maze[point.Y][point.X] == '*' {
@@ -84,7 +90,7 @@ func analyzePoint(maze Maze, openList ListFloat, closedList ListFloat, parent Po
 	}
 }
 
-func tmp(maze Maze, openList ListFloat, closedList ListFloat, currPoint Point) (ListFloat, ListFloat) {
+func tmp(maze t.Maze, openList list, closedList list, currPoint t.Point) (list, list) {
 	top, right, bottom, left := getNeighbors(maze, currPoint)
 
 	// On regarde tous ses nœuds voisins.
@@ -96,9 +102,9 @@ func tmp(maze Maze, openList ListFloat, closedList ListFloat, currPoint Point) (
 	return openList, closedList
 }
 
-func drawPath(maze Maze, lastNode *NodeFloat, closedList ListFloat) int {
-	var currNode *NodeFloat = lastNode
-	var currParent Point = lastNode.Parent
+func drawPath(maze t.Maze, lastNode *node, closedList list) int {
+	var currNode *node = lastNode
+	var currParent t.Point = lastNode.Parent
 	var cost int = 0
 
 	for currNode.Parent.X != maze.Start.X || currNode.Parent.Y != maze.Start.Y {
@@ -110,14 +116,15 @@ func drawPath(maze Maze, lastNode *NodeFloat, closedList ListFloat) int {
 	return cost
 }
 
-func FindPath(maze Maze) {
+// FindPath solves the maze
+func FindPath(maze t.Maze) {
 	var isOver bool = false
-	var openList ListFloat = make(ListFloat)
-	var closedList ListFloat = make(ListFloat)
+	var openList list = make(list)
+	var closedList list = make(list)
 	var cost int
 
 	// On commence par le nœud de départ, c'est le nœud courant.
-	var currPoint Point = maze.Start
+	var currPoint t.Point = maze.Start
 	openList, closedList = tmp(maze, openList, closedList, currPoint)
 
 	for isOver == false {
