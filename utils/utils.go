@@ -6,11 +6,12 @@ import (
 	"os"
 	"strings"
 
-	. "pathfinder/types"
+	t "pathfinder/types"
 )
 
-func CreateMazeFromFile(fileName string) Maze {
-	var m Maze
+// CreateMazeFromFile parses a map in a file and returns a Maze structure
+func CreateMazeFromFile(fileName string) t.Maze {
+	var m t.Maze
 	var startX int
 	var endX int
 
@@ -28,11 +29,11 @@ func CreateMazeFromFile(fileName string) Maze {
 		endX = strings.Index(line, "A")
 
 		if startX != -1 {
-			m.Start = Point{startX, len(m.Maze)}
+			m.Start = t.Point{X: startX, Y: len(m.Maze)}
 		}
 
 		if endX != -1 {
-			m.End = Point{endX, len(m.Maze)}
+			m.End = t.Point{X: endX, Y: len(m.Maze)}
 		}
 
 		m.Maze = append(m.Maze, line)
@@ -40,6 +41,7 @@ func CreateMazeFromFile(fileName string) Maze {
 	return m
 }
 
+// GetParams parses parameters
 func GetParams() (string, bool) {
 	len := len(os.Args)
 	if len == 2 {
@@ -51,4 +53,11 @@ func GetParams() (string, bool) {
 	} else {
 		return "", false
 	}
+}
+
+// ReplaceAtIndex replaces a char at the given index of a string
+func ReplaceAtIndex(in string, r rune, i int) string {
+    out := []rune(in)
+    out[i] = r
+    return string(out)
 }

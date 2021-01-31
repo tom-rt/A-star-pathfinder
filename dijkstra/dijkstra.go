@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"math"
 	t "pathfinder/types"
+	utils "pathfinder/utils"
 	"strconv"
 	"time"
 )
 
 type node struct {
-	CostStart float64 
-	CostEnd float64
-	Cost float64
+	Cost int
 	Parent t.Point
 }
 
@@ -91,7 +90,7 @@ func analyzePoint(maze t.Maze, openList list, closedList list, parent t.Point, p
 	}
 }
 
-func tmp(maze t.Maze, openList list, closedList list, currPoint t.Point) (list, list) {
+func checkNeighbors(maze t.Maze, openList list, closedList list, currPoint t.Point) (list, list) {
 	top, right, bottom, left := getNeighbors(maze, currPoint)
 
 	// On regarde tous ses nœuds voisins.
@@ -109,7 +108,7 @@ func drawPath(maze t.Maze, lastNode *node, closedList list) int {
 	var cost int = 0
 
 	for currNode.Parent.X != maze.Start.X || currNode.Parent.Y != maze.Start.Y {
-		maze.Maze[currParent.Y] = replaceAtIndex(maze.Maze[currParent.Y], 'o', currParent.X)
+		maze.Maze[currParent.Y] = utils.ReplaceAtIndex(maze.Maze[currParent.Y], 'o', currParent.X)
 		currNode = closedList[currNode.Parent]
 		currParent = currNode.Parent
 		cost = cost + 1
@@ -129,7 +128,7 @@ func FindPath(maze t.Maze) {
 	start = time.Now()
 	// On commence par le nœud de départ, c'est le nœud courant.
 	var currPoint t.Point = maze.Start
-	openList, closedList = tmp(maze, openList, closedList, currPoint)
+	openList, closedList = checkNeighbors(maze, openList, closedList, currPoint)
 
 	for isOver == false {
 		// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
@@ -146,20 +145,13 @@ func FindPath(maze t.Maze) {
 
 		// On réitère avec ce nœud comme nœud courant jusqu'à ce que le nœud courant soit le nœud de destination.
 		if bestPoint.X == maze.End.X && bestPoint.Y == maze.End.Y {
-			cost = drawPath(maze, bestNode, closedList)
-			isOver = true
 			elapsed = time.Since(start)
+			cost = drawPath(maze, bestNode, closedList)
 			fmt.Println("ASTAR: Chemin trouvé en " + strconv.Itoa(cost) + " coups et " + elapsed.String())
+			isOver = true
 			continue
 		} else {
-			openList, closedList = tmp(maze, openList, closedList, bestPoint)
+			openList, closedList = checkNeighbors(maze, openList, closedList, bestPoint)
 		}
 	}
-}
-
-
-func replaceAtIndex(in string, r rune, i int) string {
-    out := []rune(in)
-    out[i] = r
-    return string(out)
 }
