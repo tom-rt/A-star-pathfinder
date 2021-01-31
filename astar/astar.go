@@ -1,15 +1,17 @@
-package astarint
+package astar
 
 import (
 	"fmt"
+	"math"
 	t "pathfinder/types"
 	"strconv"
+	"time"
 )
 
 type node struct {
-	CostStart int
-	CostEnd int
-	Cost int
+	CostStart float64 
+	CostEnd float64
+	Cost float64
 	Parent t.Point
 }
 
@@ -39,19 +41,17 @@ func getBestNode(list list) (t.Point, *node) {
 	return bestPoint, bestNode
 }
 
-func calcDistance(pointA t.Point, pointB t.Point) int {
-	var abs int
-	dist := ((pointA.X - pointB.X) * (pointA.X - pointB.X)) + ((pointA.Y - pointB.Y) * (pointA.Y - pointB.Y))
-	if dist < 0 {
-		abs = dist * -1
-	} else {
-		abs = dist
-	}
-	return abs
+func calcDistance(pointA t.Point, pointB t.Point) float64 {
+	var ax float64 = float64(pointA.X)
+	var ay float64 = float64(pointA.Y)
+	var bx float64 = float64(pointB.X)
+	var by float64 = float64(pointB.Y)
+	ret := math.Sqrt(((ax - bx) * (ax - bx)) + ((ay - by) * (ay - by)))
+	return ret
 }
 
 func createNode(maze t.Maze, parent t.Point, parentNode *node, point t.Point) *node {
-	var distStart int
+	var distStart float64
 	if (parentNode == nil){
 		distStart = 1
 	} else {
@@ -82,7 +82,7 @@ func analyzePoint(maze t.Maze, openList list, closedList list, parent t.Point, p
 		node, check := openList[point]
 		newNode := createNode(maze, parent, closedList[parent], point)
 		if check {
-			if (node.Cost >= newNode.Cost) {
+			if (node.Cost > newNode.Cost) {
 				openList[point] = newNode
 			}
 		} else { // sinon, on l'ajoute dans la liste ouverte avec comme parent le noed courant, et on calcule sa qualité.
@@ -117,12 +117,16 @@ func drawPath(maze t.Maze, lastNode *node, closedList list) int {
 	return cost
 }
 
+// FindPath solves the maze
 func FindPath(maze t.Maze) {
 	var isOver bool = false
 	var openList list = make(list)
 	var closedList list = make(list)
 	var cost int
+	var start time.Time
+	var elapsed time.Duration
 
+	start = time.Now()
 	// On commence par le nœud de départ, c'est le nœud courant.
 	var currPoint t.Point = maze.Start
 	openList, closedList = tmp(maze, openList, closedList, currPoint)
@@ -144,7 +148,8 @@ func FindPath(maze t.Maze) {
 		if bestPoint.X == maze.End.X && bestPoint.Y == maze.End.Y {
 			cost = drawPath(maze, bestNode, closedList)
 			isOver = true
-			fmt.Println("INT: Chemin trouvé en " + strconv.Itoa(cost) + " coups.")
+			elapsed = time.Since(start)
+			fmt.Println("ASTAR: Chemin trouvé en " + strconv.Itoa(cost) + " coups et " + elapsed.String())
 			continue
 		} else {
 			openList, closedList = tmp(maze, openList, closedList, bestPoint)

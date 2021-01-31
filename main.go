@@ -2,9 +2,7 @@ package main
 
 import (
 	"fmt"
-	_ "math"
-	astarfloat "pathfinder/astar/float"
-	astarint "pathfinder/astar/int"
+	astar "pathfinder/astar"
 	. "pathfinder/types"
 	utils "pathfinder/utils"
 )
@@ -23,12 +21,7 @@ func main() {
 	}
 
 	maze = utils.CreateMazeFromFile(fileName)
-	astarint.FindPath(maze)
-	if print {
-		printMaze(maze.Maze)
-	}
-	maze = utils.CreateMazeFromFile(fileName)
-	astarfloat.FindPath(maze)
+	astar.FindPath(maze)
 	if print {
 		printMaze(maze.Maze)
 	}

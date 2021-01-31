@@ -1,10 +1,11 @@
-package astarfloat
+package astar
 
 import (
 	"fmt"
 	"math"
 	t "pathfinder/types"
 	"strconv"
+	"time"
 )
 
 type node struct {
@@ -122,7 +123,10 @@ func FindPath(maze t.Maze) {
 	var openList list = make(list)
 	var closedList list = make(list)
 	var cost int
+	var start time.Time
+	var elapsed time.Duration
 
+	start = time.Now()
 	// On commence par le nœud de départ, c'est le nœud courant.
 	var currPoint t.Point = maze.Start
 	openList, closedList = tmp(maze, openList, closedList, currPoint)
@@ -144,7 +148,8 @@ func FindPath(maze t.Maze) {
 		if bestPoint.X == maze.End.X && bestPoint.Y == maze.End.Y {
 			cost = drawPath(maze, bestNode, closedList)
 			isOver = true
-			fmt.Println("FLOAT: Chemin trouvé en " + strconv.Itoa(cost) + " coups.")
+			elapsed = time.Since(start)
+			fmt.Println("ASTAR: Chemin trouvé en " + strconv.Itoa(cost) + " coups et " + elapsed.String())
 			continue
 		} else {
 			openList, closedList = tmp(maze, openList, closedList, bestPoint)
