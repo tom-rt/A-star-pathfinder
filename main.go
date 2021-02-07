@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	astar "pathfinder/astar"
+	"pathfinder/dijkstra"
 	. "pathfinder/types"
 	utils "pathfinder/utils"
 )
@@ -21,7 +21,8 @@ func main() {
 	}
 
 	maze = utils.CreateMazeFromFile(fileName)
-	astar.FindPath(maze)
+	// astar.FindPath(maze)
+	dijkstra.FindPath(maze)
 	if print {
 		printMaze(maze.Maze)
 	}
