@@ -75,14 +75,13 @@ func analyzePoint(maze t.Maze, total list, parent t.Point, newPoints *[]t.Point,
 	}
 
 	// Est-il dans la liste ? Si oui, ce nœud a déjà été étudié ou bien est en cours d'étude, on ne fait rien;
-	fmt.Println(point)
 	_, check = total[point]
 	fmt.Println(point, check)
 	if !check {
 		newNode := createNode(maze, parent, total, point)
 		total[point] = newNode
+		*newPoints = append(*newPoints, point)
 	}
-	*newPoints = append(*newPoints, point)
 }
 
 func checkNeighbors(maze t.Maze, total list, lastAdded []t.Point, cost int) (list, []t.Point, int) {
@@ -99,6 +98,7 @@ func checkNeighbors(maze t.Maze, total list, lastAdded []t.Point, cost int) (lis
 	}
 	fmt.Println("######################################################")
 	fmt.Println(newPoints)
+	fmt.Println("######################################################")
 	return total, newPoints, cost + 1
 }
 
@@ -128,36 +128,43 @@ func FindPath(maze t.Maze) {
 	start = time.Now()
 	// On commence par le nœud de départ, c'est le nœud courant.
 	var currPoint t.Point = maze.Start
+	baseNode := createNode(maze, t.Point{X:0, Y:0}, total, currPoint)
+	total[currPoint] = baseNode
 	lastAdded = append(lastAdded, currPoint)
 
 	total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
-	for isOver == false {
-		// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
-		if len(lastAdded) == 0 {
+	// total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
+
+for isOver == false {
+	// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
+	if len(lastAdded) == 0 {
+		isOver = true
+		fmt.Println("Pas de solution.")
+		continue
+	}
+
+	// bestPoint, bestNode := getBestNode(list)
+
+	// On le met dans la liste fermée et on le retire de la liste ouverte.
+	// closedList[bestPoint] = bestNode
+	// delete(openList, bestPoint)
+
+	// On réitère avec ce nœud comme nœud courant jusqu'à ce que le nœud courant soit le nœud de destination.
+	for _, point := range lastAdded {
+
+		if point.X == maze.End.X && point.Y == maze.End.Y {
+			elapsed = time.Since(start)
+			// cost = drawPath(maze, bestNode, closedList)
+			fmt.Println("DIJKSTRA: Chemin trouvé en " + strconv.Itoa(cost) + " coups et " + elapsed.String())
+			// bestPoint.X == maze.End.X && bestPoint.Y == maze.End.Y {
 			isOver = true
-			fmt.Println("Pas de solution.")
 			continue
-		}
-
-		// bestPoint, bestNode := getBestNode(list)
-
-		// On le met dans la liste fermée et on le retire de la liste ouverte.
-		// closedList[bestPoint] = bestNode
-		// delete(openList, bestPoint)
-
-		// On réitère avec ce nœud comme nœud courant jusqu'à ce que le nœud courant soit le nœud de destination.
-		for _, point := range lastAdded {
-
-			if point.X == maze.End.X && point.Y == maze.End.Y {
-				elapsed = time.Since(start)
-				// cost = drawPath(maze, bestNode, closedList)
-				fmt.Println("DIJKSTRA: Chemin trouvé en " + strconv.Itoa(cost) + " coups et " + elapsed.String())
-				// bestPoint.X == maze.End.X && bestPoint.Y == maze.End.Y {
-				// isOver = true
-				continue
-			} else {
-				total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
-			}
+		} else {
+			total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
 		}
 	}
 }
+
+
+}
+
