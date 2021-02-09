@@ -54,7 +54,7 @@ func createNode(maze t.Maze, parent t.Point, total list, point t.Point) *node {
 
 	parentNode, check := total[parent]
 	if !check {
-		cost = 1
+		cost = 0
 	} else {
 		cost = parentNode.cost + 1
 	}
@@ -76,7 +76,6 @@ func analyzePoint(maze t.Maze, total list, parent t.Point, newPoints *[]t.Point,
 
 	// Est-il dans la liste ? Si oui, ce nœud a déjà été étudié ou bien est en cours d'étude, on ne fait rien;
 	_, check = total[point]
-	fmt.Println(point, check)
 	if !check {
 		newNode := createNode(maze, parent, total, point)
 		total[point] = newNode
@@ -84,7 +83,7 @@ func analyzePoint(maze t.Maze, total list, parent t.Point, newPoints *[]t.Point,
 	}
 }
 
-func checkNeighbors(maze t.Maze, total list, lastAdded []t.Point, cost int) (list, []t.Point, int) {
+func checkNeighbors(maze t.Maze, total list, lastAdded []t.Point) (list, []t.Point) {
 	var newPoints []t.Point
 	for _, currPoint := range lastAdded {
 		top, right, bottom, left := getNeighbors(maze, currPoint)
@@ -96,24 +95,18 @@ func checkNeighbors(maze t.Maze, total list, lastAdded []t.Point, cost int) (lis
 		analyzePoint(maze, total, currPoint, &newPoints, left)
 
 	}
-	fmt.Println("######################################################")
-	fmt.Println(newPoints)
-	fmt.Println("######################################################")
-	return total, newPoints, cost + 1
+	return total, newPoints
 }
 
-func drawPath(maze t.Maze, lastNode *node, closedList list) int {
+func drawPath(maze t.Maze, lastNode *node, closedList list){
 	var currNode *node = lastNode
 	var currParent t.Point = lastNode.parent
-	var cost int = 0
 
 	for currNode.parent.X != maze.Start.X || currNode.parent.Y != maze.Start.Y {
 		maze.Maze[currParent.Y] = utils.ReplaceAtIndex(maze.Maze[currParent.Y], 'o', currParent.X)
 		currNode = closedList[currNode.parent]
 		currParent = currNode.parent
-		cost = cost + 1
 	}
-	return cost
 }
 
 // FindPath solves the maze
@@ -121,48 +114,38 @@ func FindPath(maze t.Maze) {
 	var isOver bool = false
 	var total list = make(list)
 	var lastAdded []t.Point
-	var cost int
 	var start time.Time
 	var elapsed time.Duration
 
 	start = time.Now()
-	// On commence par le nœud de départ, c'est le nœud courant.
 	var currPoint t.Point = maze.Start
 	baseNode := createNode(maze, t.Point{X:0, Y:0}, total, currPoint)
 	total[currPoint] = baseNode
 	lastAdded = append(lastAdded, currPoint)
 
-	total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
-	// total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
+	total, lastAdded = checkNeighbors(maze, total, lastAdded)
 
 for isOver == false {
-	// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
 	if len(lastAdded) == 0 {
 		isOver = true
 		fmt.Println("Pas de solution.")
 		continue
 	}
 
-	// bestPoint, bestNode := getBestNode(list)
-
-	// On le met dans la liste fermée et on le retire de la liste ouverte.
-	// closedList[bestPoint] = bestNode
-	// delete(openList, bestPoint)
-
-	// On réitère avec ce nœud comme nœud courant jusqu'à ce que le nœud courant soit le nœud de destination.
+	// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
 	for _, point := range lastAdded {
-
 		if point.X == maze.End.X && point.Y == maze.End.Y {
 			elapsed = time.Since(start)
-			// cost = drawPath(maze, bestNode, closedList)
-			fmt.Println("DIJKSTRA: Chemin trouvé en " + strconv.Itoa(cost) + " coups et " + elapsed.String())
-			// bestPoint.X == maze.End.X && bestPoint.Y == maze.End.Y {
+			drawPath(maze, total[point], total)
+			totalCost := strconv.Itoa(total[total[point].parent].cost)
+			fmt.Println("DIJKSTRA: Chemin trouvé en " + totalCost + " coups et " + elapsed.String())
 			isOver = true
 			continue
-		} else {
-			total, lastAdded, cost = checkNeighbors(maze, total, lastAdded, cost)
 		}
 	}
+
+	total, lastAdded = checkNeighbors(maze, total, lastAdded)
+
 }
 
 

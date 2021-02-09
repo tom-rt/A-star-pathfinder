@@ -53,8 +53,6 @@ func calcDistance(pointA t.Point, pointB t.Point) float64 {
 
 func createNode(maze t.Maze, parent t.Point, closedList list, point t.Point) *node {
 	var costStart float64
-	// fmt.Println(parentNode)
-	// fmt.Println(parentNode == nil)
 	parentNode, check := closedList[parent]
 	if !check {
 		costStart = 1
