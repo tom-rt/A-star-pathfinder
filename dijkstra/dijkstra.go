@@ -10,7 +10,7 @@ import (
 )
 
 type node struct {
-	cost int
+	cost   int
 	parent t.Point
 }
 
@@ -59,8 +59,8 @@ func createNode(maze t.Maze, parent t.Point, total list, point t.Point) *node {
 		cost = parentNode.cost + 1
 	}
 
-	var node node = node {
-		cost: cost,
+	var node node = node{
+		cost:   cost,
 		parent: parent,
 	}
 
@@ -98,7 +98,7 @@ func checkNeighbors(maze t.Maze, total list, lastAdded []t.Point) (list, []t.Poi
 	return total, newPoints
 }
 
-func drawPath(maze t.Maze, lastNode *node, closedList list){
+func drawPath(maze t.Maze, lastNode *node, closedList list) {
 	var currNode *node = lastNode
 	var currParent t.Point = lastNode.parent
 
@@ -119,35 +119,33 @@ func FindPath(maze t.Maze) {
 
 	start = time.Now()
 	var currPoint t.Point = maze.Start
-	baseNode := createNode(maze, t.Point{X:0, Y:0}, total, currPoint)
+	baseNode := createNode(maze, t.Point{X: 0, Y: 0}, total, currPoint)
 	total[currPoint] = baseNode
 	lastAdded = append(lastAdded, currPoint)
 
 	total, lastAdded = checkNeighbors(maze, total, lastAdded)
 
-for isOver == false {
-	if len(lastAdded) == 0 {
-		isOver = true
-		fmt.Println("Pas de solution.")
-		continue
-	}
-
-	// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
-	for _, point := range lastAdded {
-		if point.X == maze.End.X && point.Y == maze.End.Y {
-			elapsed = time.Since(start)
-			drawPath(maze, total[point], total)
-			totalCost := strconv.Itoa(total[total[point].parent].cost)
-			fmt.Println("DIJKSTRA: Chemin trouvé en " + totalCost + " coups et " + elapsed.String())
+	for isOver == false {
+		if len(lastAdded) == 0 {
 			isOver = true
+			fmt.Println("Pas de solution.")
 			continue
 		}
+
+		// On cherche le meilleur nœud de toute la liste ouverte. Si la liste ouverte est vide, il n'y a pas de solution, fin de l'algorithme.
+		for _, point := range lastAdded {
+			if point.X == maze.End.X && point.Y == maze.End.Y {
+				elapsed = time.Since(start)
+				drawPath(maze, total[point], total)
+				totalCost := strconv.Itoa(total[total[point].parent].cost)
+				fmt.Println("DIJKSTRA: Chemin trouvé en " + totalCost + " coups et " + elapsed.String())
+				isOver = true
+				continue
+			}
+		}
+
+		total, lastAdded = checkNeighbors(maze, total, lastAdded)
+
 	}
 
-	total, lastAdded = checkNeighbors(maze, total, lastAdded)
-
 }
-
-
-}
-
