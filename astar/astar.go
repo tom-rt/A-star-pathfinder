@@ -10,10 +10,10 @@ import (
 )
 
 type node struct {
-	costStart float64 
-	costEnd float64
-	cost float64
-	parent t.Point
+	costStart int
+	costEnd   float64
+	cost      float64
+	parent    t.Point
 }
 
 type list map[t.Point]*node
@@ -52,9 +52,7 @@ func calcDistance(pointA t.Point, pointB t.Point) float64 {
 }
 
 func createNode(maze t.Maze, parent t.Point, closedList list, point t.Point) *node {
-	var costStart float64
-	// fmt.Println(parentNode)
-	// fmt.Println(parentNode == nil)
+	var costStart int
 	parentNode, check := closedList[parent]
 	if !check {
 		costStart = 1
@@ -62,11 +60,11 @@ func createNode(maze t.Maze, parent t.Point, closedList list, point t.Point) *no
 		costStart = parentNode.costStart + 1
 	}
 	var costEnd = calcDistance(maze.End, point)
-	var node node = node {
+	var node node = node{
 		costStart: costStart,
-		costEnd: costEnd,
-		cost: costStart + costEnd,
-		parent: parent,
+		costEnd:   costEnd,
+		cost:      float64(costStart) + costEnd,
+		parent:    parent,
 	}
 	return &node
 }
@@ -85,7 +83,7 @@ func analyzePoint(maze t.Maze, openList list, closedList list, parent t.Point, p
 		node, check := openList[point]
 		newNode := createNode(maze, parent, closedList, point)
 		if check {
-			if (node.cost > newNode.cost) {
+			if node.cost > newNode.cost {
 				openList[point] = newNode
 			}
 		} else { // sinon, on l'ajoute dans la liste ouverte avec comme parent le noed courant, et on calcule sa qualité.
